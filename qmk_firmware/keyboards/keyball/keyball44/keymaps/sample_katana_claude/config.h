@@ -20,7 +20,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#define EARLY_INIT_PERFORM_BOOTLOADER_JUMP FALSE
+
+// 基本設定
+#define TAPPING_TERM 200
+#define TAPPING_TERM_PER_KEY
+#define IGNORE_MOD_TAP_INTERRUPT
+#define PERMISSIVE_HOLD
+#define TAPPING_FORCE_HOLD
+#define LANGUAGE_RETURN JP
+
+// 日本語入力関連
+#define JAPANESE_MODE
+#define SEND_STRING_DELAY 10
+#define TAP_CODE_DELAY 10
+
+// レイヤー関連
+#define ONESHOT_TAP_TOGGLE 5  /* Tapping this number of times holds the key until tapped once again. */
+#define ONESHOT_TIMEOUT 5000  /* Time (in ms) before the one shot key is released */
+#define LAYER_STATE_8BIT
+
+// Tap Dance設定
+#define TAPPING_TOGGLE 1
+#define TAP_DANCE_TAPPING_TERM 200
+
+// 機能の無効化でファームウェアサイズを削減
+#define NO_ACTION_MACRO
+#define NO_ACTION_FUNCTION
+#define RGBLIGHT_DISABLE
+#define NO_DEBUG
+#define NO_PRINT
+
 #ifdef RGBLIGHT_ENABLE
+#    undef RGBLIGHT_ANIMATIONS
 #    define RGBLIGHT_EFFECT_BREATHING
 #    define RGBLIGHT_EFFECT_RAINBOW_MOOD
 #    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
@@ -33,14 +65,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define RGBLIGHT_EFFECT_TWINKLE
 #endif
 
-// 薙刀式の設定
-#define UNICODE_SELECTED_MODES UNICODE_MODE_MACOS, UNICODE_MODE_LINUX, UNICODE_MODE_WINCOMPOSE
-#define UNICODE_KEY_WINCOMPOSE KC_RALT
-
-// タップキーの遅延設定
-#define TAP_CODE_DELAY 10
+#ifdef OLED_ENABLE
+#    define OLED_DISPLAY_128X32
+#    define OLED_FONT_H "keyboards/keyball/lib/glcdfont.c"
+#endif
 
 #define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #define AUTO_MOUSE_DEFAULT_LAYER 1
-
-#define SPLIT_HAND_MATRIX_GRID_LOW_IS_LEFT

@@ -1,0 +1,98 @@
+/* Tap danceの設定 */
+#ifdef TAP_DANCE_ENABLE
+int cur_dance (tap_dance_state_t *state) {
+  if (state->count ==1) {
+    if (!state->pressed) return SINGLE_TAP;
+    else return SINGLE_HOLD;
+  }
+  else if (state->count == 2) {
+    if (state->interrupted) return DOUBLE_SINGLE_TAP;
+    else if (state->pressed) return SINGLE_TAP_HOLD;
+    else return DOUBLE_TAP;
+  }
+  else return 8; //magic number. At some point this method will expand to work for more presses
+}
+
+static tap xtap_state = {
+  .is_press_action = true,
+  .state = 0
+};
+
+/* X_TAP_DANCE_1の定義 */
+void x_finished_1 (tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    case SINGLE_TAP:
+        register_code(KC_ENT);
+        break;
+    case SINGLE_HOLD:
+        layer_on(_RAISE);
+        break;
+    case DOUBLE_TAP:
+        layer_invert(_LOWER);
+        break;
+    case SINGLE_TAP_HOLD:
+        layer_on(_LOWER);
+        break;
+  }
+}
+
+void x_reset_1 (tap_dance_state_t *state, void *user_data) {
+  switch (xtap_state.state) {
+    case SINGLE_TAP: 
+        unregister_code(KC_ENT);
+        break;
+    case SINGLE_HOLD:
+        layer_off(_RAISE);
+        break;
+    case DOUBLE_TAP:
+        break;
+    case SINGLE_TAP_HOLD:
+        layer_off(_LOWER);
+        break;
+  }
+  xtap_state.state = 0;
+}
+
+/* X_TAP_DANCE_2の定義 */
+void x_finished_2 (tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    case SINGLE_TAP:
+        register_code(KC_MUTE);
+        break;
+    case SINGLE_HOLD:
+        layer_on(_ADJUST);
+        break;
+    case DOUBLE_TAP:
+        layer_invert(_RAISE);
+        break;
+    case SINGLE_TAP_HOLD:
+        layer_on(_LOWER);
+        break;
+  }
+}
+
+void x_reset_2 (tap_dance_state_t *state, void *user_data) {
+  switch (xtap_state.state) {
+    case SINGLE_TAP: 
+        unregister_code(KC_MUTE);
+        break;
+    case SINGLE_HOLD:
+        layer_off(_ADJUST);
+        break;
+    case DOUBLE_TAP:
+        break;
+    case SINGLE_TAP_HOLD:
+        layer_off(_LOWER);
+        break;
+  }
+  xtap_state.state = 0;
+}
+
+
+tap_dance_action_t tap_dance_actions[] = {
+ [X_TAP_DANCE_1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, x_finished_1, x_reset_1),
+ [X_TAP_DANCE_2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, x_finished_2, x_reset_2),
+};
+#endif

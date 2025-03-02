@@ -1,0 +1,1039 @@
+#include QMK_KEYBOARD_H
+
+extern keymap_config_t keymap_config;
+
+// KATAKA Keyborad: Ergo 42片手部分でのカタナ式キーボード
+// built by OOOKA Toshihiko
+// 左手キーボード用
+
+
+// レイヤー構造
+#define BASE 0
+#define KSFT 1   // KATANA Shift
+#define HEN1 2   // 編集モード1
+#define HEN2 3   // 編集モード2
+//促音やmwに使うレイヤー
+#define after_R 4 // Rを押したときのレイヤー
+#define after_K 5 // Kを押したときのレイヤー
+#define after_T 6 // Tを押したときのレイヤー
+#define after_S 7 // Sを押したときのレイヤー
+#define after_P 8 // Pを押したときのレイヤー
+#define after_H 9 // Hを押したときのレイヤー
+#define after_N 10// Nを押したときのレイヤー
+#define after_G 11// Gを押したときのレイヤー
+#define after_D 12// Dを押したときのレイヤー
+#define after_Z 13// Zを押したときのレイヤー
+#define after_B 14// Bを押したときのレイヤー
+#define after_F 15// Fを押したときのレイヤー
+#define HEN3 16   // 編集モード2のシフト
+//Lower(SYMB),Raise(META)
+#define SYMB 29
+#define META 30
+#define GAME 31
+
+// Fillers to make layering more clear
+#define _______ KC_TRNS
+#define XXXXXXX KC_NO
+
+static bool winmac = true; // win or mac
+static bool eisu = false;  // eisu on off
+static bool kana = false;  // kana on off
+
+// macro name
+// 編集モードなどの機能、促音やmwなどはこれで実現している
+enum custom_keycodes {
+// んと（。）確定
+  NX = SAFE_RANGE,
+  DTET, 
+// 英数かな、WinMac切り替え
+  MC_EISU,
+  MC_KANA,
+  SW_2MAC,
+  SW_2WIN,
+//それぞれの子音を打った時の挙動
+  MC_K,
+  MC_R,
+  MC_S,
+  MC_T,
+  MC_P,
+  MC_H,
+  MC_N,
+  MC_G,
+  MC_Z,
+  MC_D,
+  MC_F,
+  MC_B,
+//促音
+  MC_XTUK,
+  MC_XTUG,
+  MC_XTUS,
+  MC_XTUZ,
+  MC_XTUT,
+  MC_XTUD,
+  MC_XTUH,
+  MC_XTUB,
+  MC_XTUP,
+  MC_XTUF,
+//ふたつの子音で決まる子音
+  MC_M,
+  MC_W,
+  MC_V,
+// 編集モードなどのマクロ
+  //記号
+  MC_QUES,
+  MC_EXRM,
+  MC_NKGR,
+  MC_MARU,
+  MC_SNTN,
+  MC_NGDS,
+  MC_SLSH,
+  MC_COLN,
+// []
+  MC_KGHR,
+  MC_KGTJ,
+  MC_KKHR,
+  MC_KKTJ,
+  MC_NJHR,
+  MC_NJTJ,
+  MC_FRST,
+  MC_FRHR,
+  MC_FRTJ,
+  MC_SMHR,
+  MC_SMTJ,
+  //機能マクロ
+  MC_REDO,
+  MC_SAVE,
+  MC_COPY,
+  MC_PSTE,
+  MC_UNDO,
+  MC_CUT,
+  MC_SHEN,
+  MC_HIRA,
+  MC_KATA,
+  MC_EDBS,
+  MC_ETED,
+  MC_UP5,
+  MC_LT5,
+  MC_RT5,
+  MC_DN5,
+  //「」□マクロ
+  MC_KG1,
+  MC_KG2,
+  MC_KG3,
+  MC_SP1,
+  MC_SP2,
+  MC_SP3
+};
+
+// macro実装部
+/////////////
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case SW_2MAC:
+      if (record->event.pressed) {
+        winmac = false; // Mac
+        SEND_STRING("Mac");   
+      } else {
+      }
+      break;
+    case SW_2WIN:
+      if (record->event.pressed) {
+        winmac = true; // Win
+        SEND_STRING("Win");   
+      } else {
+      }
+      break;
+    case MC_EISU: // 英数
+      if (record->event.pressed) {
+        eisu = true;
+        layer_on(HEN1);
+      } else {
+        layer_off(HEN1);
+        if (eisu) {
+          if (winmac) {
+            tap_code(KC_MHEN);  // Win
+          } else {
+            tap_code(KC_LANG2); // Mac
+          }
+        }
+        eisu = false;        
+      }
+      return false;
+      break;
+    case MC_KANA: // かな
+      if (record->event.pressed) {
+        kana = true;
+        layer_on(HEN2);
+      } else {
+        layer_off(HEN2);
+        if (kana) {
+          if (winmac) {
+            tap_code(KC_HENK);  // Win
+          } else {
+            tap_code(KC_LANG1); // Mac
+          }
+        }
+        kana = false;        
+      }
+      return false;
+      break;
+//んと。確定
+    case NX:
+      if (record->event.pressed) {
+        SEND_STRING("nn");   // ローマ字のん単打
+      } else {
+      }
+      break;
+    case DTET:
+      if (record->event.pressed) {
+        SEND_STRING("." SS_TAP(X_ENTER));  // 。確定
+      } else {
+      }
+      break;
+//各子音を打った時の挙動
+    case MC_R:
+      if (record->event.pressed) {
+        // rの時のマクロ
+        SEND_STRING("r");
+        set_oneshot_layer(after_R, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_K:
+      if (record->event.pressed) {
+        // Kの時のマクロ
+        SEND_STRING("k");
+        set_oneshot_layer(after_K, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_T:
+      if (record->event.pressed) {
+        // Tの時のマクロ
+        SEND_STRING("t");
+        set_oneshot_layer(after_T, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_S:
+      if (record->event.pressed) {
+        // Sの時のマクロ
+        SEND_STRING("s");
+        set_oneshot_layer(after_S, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_P:
+      if (record->event.pressed) {
+        // Pの時のマクロ
+        SEND_STRING("p");
+        set_oneshot_layer(after_P, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_H:
+      if (record->event.pressed) {
+        // Hの時のマクロ
+        SEND_STRING("h");
+        set_oneshot_layer(after_H, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_N:
+      if (record->event.pressed) {
+        // Nの時のマクロ
+        SEND_STRING("n");
+        set_oneshot_layer(after_N, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+     //濁音
+    case MC_G:
+      if (record->event.pressed) {
+        // Gの時のマクロ
+        SEND_STRING("g");
+        set_oneshot_layer(after_G, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_D:
+      if (record->event.pressed) {
+        // Dの時のマクロ
+        SEND_STRING("d");
+        set_oneshot_layer(after_D, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_Z:
+      if (record->event.pressed) {
+        // Zの時のマクロ
+        SEND_STRING("z");
+        set_oneshot_layer(after_Z, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_F:
+      if (record->event.pressed) {
+        // Fの時のマクロ
+        SEND_STRING("f");
+        set_oneshot_layer(after_F, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    case MC_B:
+      if (record->event.pressed) {
+        // Bの時のマクロ
+        SEND_STRING("b");
+        set_oneshot_layer(after_B, ONESHOT_START);
+              } else {
+        clear_oneshot_layer_state(ONESHOT_PRESSED);
+      }
+      break;
+    //同時打鍵子音mwv
+    case MC_M:
+      if (record->event.pressed) {
+        // BS+m
+        SEND_STRING(SS_TAP(X_BSPACE)"m");
+      } else {
+      }
+      break;
+    case MC_W:
+      if (record->event.pressed) {
+        // BS+w
+        SEND_STRING(SS_TAP(X_BSPACE)"w");
+      } else {
+      }
+      break;
+    case MC_V:
+      if (record->event.pressed) {
+        // BS+v
+        SEND_STRING(SS_TAP(X_BSPACE)"v");
+      } else {
+      }
+      break;
+//促音マクロ
+    case MC_XTUK:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtuk");
+      } else {
+      }
+      break;
+    case MC_XTUG:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtug");
+      } else {
+      }
+      break;
+    case MC_XTUS:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtus");
+      } else {
+      }
+      break;
+    case MC_XTUZ:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtuz");
+      } else {
+      }
+      break;
+    case MC_XTUT:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtut");
+      } else {
+      }
+      break;
+    case MC_XTUD:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtud");
+      } else {
+      }
+      break;
+    case MC_XTUH:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtuh");
+      } else {
+      }
+      break;
+    case MC_XTUB:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtub");
+      } else {
+      }
+      break;
+    case MC_XTUP:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtup");
+      } else {
+      }
+      break;
+    case MC_XTUF:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSPACE)"xtuf");
+      } else {
+      }
+      break;
+// 編集モードなどのマクロ
+    // win mac でコマンドが違うもの
+    case MC_REDO: //Redo
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("y")); //win
+        } else {
+          SEND_STRING(SS_LGUI(SS_LSFT("z"))); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_SAVE: //Save
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("s")); //win
+        } else {
+          SEND_STRING(SS_LGUI("s")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_COPY: //Copy
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("c")); //win
+        } else {
+          SEND_STRING(SS_LGUI("c")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_PSTE: //Paste
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("v")); //win
+        } else {
+          SEND_STRING(SS_LGUI("v")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_UNDO: //Undo
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("z")); //win
+        } else {
+          SEND_STRING(SS_LGUI("z")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_CUT: //Cut
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("x")); //win
+        } else {
+          SEND_STRING(SS_LGUI("x")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_SHEN: //再変換
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_TAP(X_INT4)); //win
+        } else {
+          tap_code(KC_LANG1);
+          tap_code(KC_LANG1); //macかなキーダブルクリック
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_HIRA: //ひらがな変換
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("u")); //win
+        } else {
+          SEND_STRING(SS_LCTRL("j")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    case MC_KATA: //カタカナ変換
+      if (record->event.pressed) {
+        if (winmac) {
+          SEND_STRING(SS_LCTRL("i")); //win
+        } else {
+          SEND_STRING(SS_LCTRL("k")); //mac
+        }
+      } else {
+      }
+        eisu = false;
+        kana = false;
+      break;
+    // 記号系：ユニコードを出力するのが無理っぽいので、単語登録を使うことにした
+    case MC_QUES: //?
+      if (record->event.pressed) {
+        SEND_STRING(SS_LSFT(SS_TAP(X_SLASH)) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_EXRM: //!
+      if (record->event.pressed) {
+        SEND_STRING(SS_LSFT(SS_TAP(X_1)) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_NKGR: //中黒・
+      if (record->event.pressed) {
+        SEND_STRING("nakaguro" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_MARU: //〇
+      if (record->event.pressed) {
+        SEND_STRING("siromaru" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_SNTN: //……
+      if (record->event.pressed) {
+        SEND_STRING("santen" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+        SEND_STRING("santen" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+   case  MC_NGDS: //──
+      if (record->event.pressed) {
+        SEND_STRING("nagadasshu" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+        SEND_STRING("nagadasshu" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_SLSH: // ／
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_SLASH) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_COLN: // :
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_QUOTE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+   //[]関係
+    case MC_KGHR: //[
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_RBRACKET) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_KGTJ: //]
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSLASH) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_KKHR: //(
+      if (record->event.pressed) {
+        SEND_STRING(SS_LSFT(SS_TAP(X_8)) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_KKTJ: //)
+      if (record->event.pressed) {
+        SEND_STRING(SS_LSFT(SS_TAP(X_9)) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_NJHR: //『
+      if (record->event.pressed) {
+        SEND_STRING("nijuhira" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_NJTJ: //』
+      if (record->event.pressed) {
+        SEND_STRING("nijutoji" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_FRST: //|
+      if (record->event.pressed) {
+        SEND_STRING(SS_LSFT(SS_TAP(X_INT3)) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_FRHR: //《
+      if (record->event.pressed) {
+        SEND_STRING("furihira" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_FRTJ: //》
+      if (record->event.pressed) {
+        SEND_STRING("furitoji" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_SMHR: //【
+      if (record->event.pressed) {
+        SEND_STRING("sumihira" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    case MC_SMTJ: //】
+      if (record->event.pressed) {
+        SEND_STRING("sumitoji" SS_TAP(X_SPACE) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+    // 機能系
+    case MC_EDBS: //末消
+      if (record->event.pressed) {
+        SEND_STRING(SS_LSFT(SS_TAP(X_END)));
+        SEND_STRING(SS_TAP(X_BSPACE));
+      } else {
+      }
+      break;
+   case  MC_ETED: //確定エンド
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_ENTER)SS_TAP(X_END));
+      } else {
+      }
+      break;
+   case  MC_UP5: //上５
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_UP) SS_TAP(X_UP) SS_TAP(X_UP) SS_TAP(X_UP) SS_TAP(X_UP));
+      } else {
+      }
+      break;
+   case  MC_LT5: //左５
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_LEFT) SS_TAP(X_LEFT) SS_TAP(X_LEFT) SS_TAP(X_LEFT) SS_TAP(X_LEFT));
+      } else {
+      }
+      break;
+   case  MC_RT5: //右５
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_RIGHT) SS_TAP(X_RIGHT) SS_TAP(X_RIGHT) SS_TAP(X_RIGHT) SS_TAP(X_RIGHT));
+      } else {
+      }
+      break;
+   case  MC_DN5: //下５
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_DOWN) SS_TAP(X_DOWN) SS_TAP(X_DOWN) SS_TAP(X_DOWN) SS_TAP(X_DOWN));
+      } else {
+      }
+      break;
+   case  MC_KG1: //「マクロ
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSLASH) SS_TAP(X_ENTER) SS_TAP(X_ENTER) " ");
+      } else {
+      }
+      break;
+   case  MC_KG2: //「マクロ
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSLASH) SS_TAP(X_ENTER) SS_TAP(X_ENTER) SS_TAP(X_RBRACKET) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+   case  MC_KG3: //「マクロ
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_BSLASH) SS_TAP(X_ENTER) SS_TAP(X_ENTER));
+      } else {
+      }
+      break;
+   case  MC_SP1: //□マクロ
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_HOME) SS_TAP(X_ENTER) " " SS_TAP(X_END));
+      } else {
+      }
+      break;
+   case  MC_SP2: //□マクロ
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_HOME) SS_TAP(X_ENTER) "   " SS_TAP(X_END));
+      } else {
+      }
+      break;
+   case  MC_SP3: //□マクロ
+      if (record->event.pressed) {
+        SEND_STRING("   ");
+      } else {
+      }
+      break;
+// フラグ関係のリセット
+    default:
+      if (record->event.pressed) {
+        eisu = false;
+        kana = false;
+      }
+      break;
+  }
+  return true;
+};
+
+/////////////////////////////////
+// ここから配列表
+/////////////////////////////////
+
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+
+  /* BASE
+   * ,------------------------------------------------.
+   * | T    | S    | P    |  UP  |  BS  |   I  |  E   |
+   * |------+------+------+------+------+------+------|
+   * | R    | K    | LEFT |RIGHT |   A  |   U  |  Y   |
+   * |------+------+------+------+------+------+------|
+   * | H    | N    | DOWN | ENT  |   O  |  NN  |  -   |
+   * |------+------+------+------+------+------+------|
+   * | EISU |  SP  | SYMB | META |  SP  | KANA |LShift|
+   * `------------------------------------------------'
+   */
+  [BASE] = LAYOUT( \
+    MC_T,    MC_S,             MC_P,     KC_UP,    KC_BSPC,          KC_I,    KC_E,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_R,    MC_K,             KC_LEFT,  KC_RGHT,  KC_A,             KC_U,    KC_Y,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_H,    MC_N,             KC_DOWN,  KC_ENT,   KC_O,             NX,      KC_MINS,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_EISU, LT(KSFT, KC_SPC), MO(SYMB), MO(META), LT(KSFT, KC_SPC), MC_KANA, KC_LSFT,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+//    LT(HEN1, MC_EISU),  LT(HEN2, MC_KANA), 
+//    のようにしたかったが、LT()はBasic keycodeのみ対応で、macroに対応してないっぽい
+  ),
+
+
+//シフト面
+/* KSFT; Katana Shift
+   * ,------------------------------------------------.
+   * | D    | Z    | F    |S_UP  |   X  |   I  |   E  |
+   * |------+------+------+------+------+------+------|
+   * | R    | G    |S_LFT |S_RIGT|   A  |   U  |   Y  |
+   * |------+------+------+------+------+------+------|
+   * | B    | ,    |S_DWN | .Ent |   O  |  NN  |   -  |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |      |      |      |
+   * `------------------------------------------------'
+   */
+  [KSFT] = LAYOUT( \
+    MC_D,    MC_Z,    MC_F,       S(KC_UP),   KC_X,    KC_I,    KC_E,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_R,    MC_G,    S(KC_LEFT), S(KC_RGHT), KC_A,    KC_U,    KC_Y,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_B,    KC_COMM, S(KC_DOWN), DTET,       KC_O,    NX,      KC_MINS,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, MO(SYMB),   MO(META),   _______, _______, KC_LSFT,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+  /* HEN1 編集モード1
+   * ,------------------------------------------------.
+   * | redo | save | Esc  | Home | 文末消| 再変換|  Del |
+   * |------+------+------+------+------+------+------|
+   * | copy |paste |カタカナ |EntEnd| up   | S up | up 5 |
+   * |------+------+------+------+------+------+------|
+   * | undo | cut  |ひらがな |  End | down | S dn | dn 5 |
+   * |------+------+------+------+------+------+------|
+   * |!!!!!!| シフト |      |      | シフト |      | シフト  |
+   * `------------------------------------------------'
+   */
+  [HEN1] = LAYOUT( \
+    MC_REDO, MC_SAVE,  KC_ESC,  KC_HOME, MC_EDBS, MC_SHEN,    KC_DEL,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_COPY, MC_PSTE,  MC_KATA, MC_ETED, KC_UP,   S(KC_UP),   MC_UP5,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_UNDO, MC_CUT,   MC_HIRA, KC_END,  KC_DOWN, S(KC_DOWN), MC_DN5,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, KC_LSFT,  _______, _______, KC_LSFT, _______,    KC_LSFT,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+  /* HEN2 編集モード2
+   * ,------------------------------------------------.
+   * |  ・と/ | 〇と：|行頭□  | 」改□  |  PD  |  PU  |  |  |
+   * |------+------+------+------+------+------+------|
+   * |   !  |   ?  |行頭□□□| 」改「  | 「と『  | (と【 |  《   |
+   * |------+------+------+------+------+------+------|
+   * |  ……  |  --  |□□□   | 」改   | 」と』  | )と】 |  》   |
+   * |------+------+------+------+------+------+------|
+   * |      | シフト |      |      | シフト |!!!!!!| シフト |
+   * `------------------------------------------------'
+   */
+  [HEN2] = LAYOUT( \
+    MC_NKGR, MC_MARU,  MC_SP1,  MC_KG1,  KC_PGDN,  KC_PGUP, MC_FRST,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_EXRM, MC_QUES,  MC_SP2,  MC_KG2,  MC_KGHR,  MC_KKHR, MC_FRHR,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_SNTN, MC_NGDS,  MC_SP3,  MC_KG3,  MC_KGTJ,  MC_KKTJ, MC_FRTJ,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MO(HEN3), _______, _______, MO(HEN3), _______, KC_LSFT,    KXXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+  /* HEN3 編集モード2のシフト
+   * ,------------------------------------------------.
+   * |   /  |  ：  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |  『   |  【   |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |  』   |  】   |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |      |      |      |
+   * `------------------------------------------------'
+   */
+  [HEN3] = LAYOUT( \
+    MC_SLSH, MC_COLN, _______, _______, _______, _______, _______,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, MC_NJHR, MC_SMHR, _______,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, MC_NJTJ, MC_SMTJ, _______,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_R
+   * ,------------------------------------------------.
+   * |  っt  |  っS  |  っp  |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |!!!!!!|BS M  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |  っh  |      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_R] = LAYOUT( \
+    MC_XTUT, MC_XTUS, MC_XTUP, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_M,    _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUH, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_K
+   * ,------------------------------------------------.
+   * |  っT  |  っS  |  っP  |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * | BS M |!!!!!!|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |  っH  |      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |aftr_G|aftr_G|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_K] = LAYOUT( \
+    MC_XTUT, MC_XTUS, MC_XTUP, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_M,   _______,  _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUH, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_T
+   * ,------------------------------------------------.
+   * |!!!!!!|  っS  |  っP  |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |  っK  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |  っH  |      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |aftr_D|aftr_D|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_T] = LAYOUT( \
+    _______, MC_XTUS, MC_XTUP, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUK, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUH, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_S
+   * ,------------------------------------------------.
+   * |  っT  |!!!!!!|  っP  |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |  っK  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |  っH  |      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |aftr_D|aftr_D|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_S] = LAYOUT( \
+    MC_XTUT, _______, MC_XTUP, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUK, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUH, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_P
+   * ,------------------------------------------------.
+   * |  っT  |  っS  |!!!!!!|      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |  っK  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |  っH  |      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |aftr_D|aftr_D|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_P] = LAYOUT( \
+    MC_XTUT, MC_XTUS, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUK, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUH, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_H
+   * ,------------------------------------------------.
+   * |  っt  |  っS  |  っp  |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |  っk  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |!!!!!!| BS W |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_H] = LAYOUT( \
+    MC_XTUT, MC_XTUS, MC_XTUP, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUK, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_W,    _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_N
+   * ,------------------------------------------------.
+   * |  っt  |  っS  |  っp  |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |  っk  |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * | BS W |!!!!!!|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |      |      |      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_N] = LAYOUT( \
+    MC_XTUT, MC_XTUS, MC_XTUP, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUK, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_W,    _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+////以下濁音
+/* after_G
+   * ,------------------------------------------------.
+   * |BSxtuD|BSxtuZ|BSxtuF|      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |BS M  |!!!!!!|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |BSxtuB|      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |!!!!!!|!!!!!!|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_G] = LAYOUT( \
+    MC_XTUD, MC_XTUZ, MC_XTUF, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_M,   _______,  _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUB, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_D
+   * ,------------------------------------------------.
+   * |!!!!!!|BSxtuZ|BSxtuF|      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |BSxtuG|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |BSxtuB|      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |!!!!!!|!!!!!!|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_D] = LAYOUT( \
+    _______, MC_XTUZ, MC_XTUF, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUG, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUB, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_Z
+   * ,------------------------------------------------.
+   * |BSxtuD|!!!!!!|BSxtuF|      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |BSxtuG|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |BSxtuB|      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |!!!!!!|!!!!!!|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_Z] = LAYOUT( \
+    MC_XTUD, _______, MC_XTUF, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUG, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUB, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_B
+   * ,------------------------------------------------.
+   * |BSxtuD|BSxtuZ|BSxtuF|      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |BSxtuG|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |!!!!!!| BS V |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |!!!!!!|!!!!!!|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_B] = LAYOUT( \
+    MC_XTUD, MC_XTUZ, MC_XTUB, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUG, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_V,    _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+/* after_F
+   * ,------------------------------------------------.
+   * |BSxtuD|BSxtuZ|!!!!!!|      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |BSxtuG|      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |BSxtuB|      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|
+   * |      |      |!!!!!!|!!!!!!|      |      |      |
+   * `------------------------------------------------'
+   */
+  [after_F] = LAYOUT( \
+    MC_XTUD, MC_XTUZ, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, MC_XTUG, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    MC_XTUB, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, _______, _______, _______, _______, _______,      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+
+  /* SYMB // 記号はJIS配列前提 // USは KC_EQL, KC_ASTR, KC_PLUS, で書き換え
+   * ,------------------------------------------------.
+   * |   C  |   J  |      |   =  |   7  |   8  |  9   |
+   * |------+------+------+------+------+------+------|
+   * |   L  |   Q  |   /  |   -  |   4  |   5  |  6   |
+   * |------+------+------+------+------+------+------|
+   * |      |      |   *  |   +  |   1  |   2  |  3   |
+   * |------+------+------+------+------+------+------|
+   * |      |Shift |!!!!!!|SW2Mac|   0  |      | Shift|
+   * `------------------------------------------------'
+   */ 
+  [SYMB] = LAYOUT( \
+    KC_C,    KC_J,    _______,    S(KC_MINS), KC_7, KC_8,    KC_9,       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    KC_L,    KC_J,    KC_SLSH,    KC_MINS,    KC_4, KC_5,    KC_6,       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, _______, S(KC_QUOT), S(KC_SCLN), KC_1, KC_2,    KC_3,       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, KC_LSFT, _______,    SW_2MAC,    KC_0, _______, KC_LSFT,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  ),
+
+  /* META //記号部は、jisになるように、US kodeで設定するしかないかも。
+   * ,------------------------------------------------.
+   * |   -  |   ^  |   \  |      |   '  |   (  |   )  |
+   * |------+------+------+------+------+------+------|
+   * |   @  |   [  |   ]  |      |   $  |   %  |   &  |
+   * |------+------+------+------+------+------+------|
+   * |   ;  |   :  |   _  |      |   !  |   "  |   #  |
+   * |------+------+------+------+------+------+------|
+   * |      |Shift |SW2WIN|!!!!!!|Shift |      | Shift|
+   * `------------------------------------------------'
+   */
+  [META] = LAYOUT( \
+    KC_MINS, KC_EQL,  KC_JYEN,  _______, S(KC_7), S(KC_8), S(KC_9),    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    KC_LBRC, KC_RBRC, KC_BSLS,  _______, S(KC_4), S(KC_5), S(KC_6),    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    KC_SCLN, KC_QUOT, S(KC_RO), _______, S(KC_1), S(KC_2), S(KC_3),    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    _______, KC_LSFT,  SW_2WIN, _______, KC_LSFT, _______, KC_LSFT,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX \
+  )
+
+
+};

@@ -17,8 +17,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#include "twpair_on_jis.h"
+#include "naginata.h"
 
-#include "quantum.h"
+// 薙刀式のオン/オフに使うキーの定義
+static uint16_t ng_on_keys[] = {KC_H, KC_J};  // HJで薙刀式オン
+static uint16_t ng_off_keys[] = {KC_F, KC_G}; // FGで薙刀式オフ
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -50,8 +54,32 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     RGB_RMOD , RGB_HUD  , RGB_SAD  , RGB_VAD  , _______  , SCRL_DVD ,                                        CPI_D1K  , CPI_D100 , CPI_I100 , CPI_I1K  , _______  , KBC_SAVE ,
                   QK_BOOT  , KBC_RST  , _______  ,        _______  , _______  ,                   _______  , _______  , _______       , KBC_RST  , QK_BOOT
   ),
+
+  // 薙刀式レイヤー
+  [4] = LAYOUT_universal(
+    NG_Q     , NG_W     , NG_E     , NG_R     , NG_T     , _______  ,                                        NG_Y     , NG_U     , NG_I     , NG_O     , NG_P     , _______  ,
+    NG_A     , NG_S     , NG_D     , NG_F     , NG_G     , _______  ,                                        NG_H     , NG_J     , NG_K     , NG_L     , NG_SCLN  , _______  ,
+    NG_SHFT  , NG_Z     , NG_X     , NG_C     , NG_V     , NG_B     ,                                        NG_N     , NG_M     , NG_COMM  , NG_DOT   , NG_SLSH  , NG_SHFT2 ,
+                KC_LALT  , KC_LGUI  , KC_LCTL  ,          KC_SPC   , KC_LNG1  ,                   KC_BSPC  , KC_ENT   , KC_RCTL        , KC_RALT  , KC_PSCR
+  ),
 };
 // clang-format on
+
+void keyboard_post_init_user(void) {
+    // 薙刀式の初期化
+    set_naginata(4, ng_on_keys, ng_off_keys); // レイヤー4を薙刀式レイヤーとして使用
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // 薙刀式の処理
+    if (!process_naginata(keycode, record)) {
+        return false;
+    }
+    if (!twpair_on_jis(keycode, record)) {
+        return false;
+    }
+    return true;
+}
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     // Auto enable scroll mode when the highest layer is 3
