@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAP_CODE_DELAY 10
 
 // レイヤー数の設定
-#define DYNAMIC_KEYMAP_LAYER_COUNT 5  // 0-4の5レイヤーをサポート
+#define DYNAMIC_KEYMAP_LAYER_COUNT 4  // 0-3の4レイヤーをサポート
 #define LAYER_STATE_8BIT
 
 #define POINTING_DEVICE_AUTO_MOUSE_ENABLE
