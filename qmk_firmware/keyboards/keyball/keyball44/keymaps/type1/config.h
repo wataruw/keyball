@@ -36,14 +36,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 薙刀式の設定
 #define UNICODE_SELECTED_MODES UNICODE_MODE_MACOS, UNICODE_MODE_LINUX, UNICODE_MODE_WINCOMPOSE
 #define UNICODE_KEY_WINCOMPOSE KC_RALT
+#define NG_NO_HENSHU
+#define NG_NO_KOYUMEISHI
 
 // タップキーの遅延設定
 #define TAP_CODE_DELAY 10
 
 // レイヤー数の設定
 #define DYNAMIC_KEYMAP_LAYER_COUNT 5  // 0-4の5レイヤーをサポート
+#define LAYER_STATE_8BIT
 
 #define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #define AUTO_MOUSE_DEFAULT_LAYER 1
 
 #define SPLIT_HAND_MATRIX_GRID_LOW_IS_LEFT
+
+#undef LOCKING_SUPPORT_ENABLE
+#undef LOCKING_RESYNC_ENABLE
+#undef NO_ACTION_TAPPING
+
