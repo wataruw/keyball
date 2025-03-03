@@ -44,8 +44,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [2] = LAYOUT_universal(
     _______  ,S(JP_1)   , S(JP_2)  , S(JP_3) , S(JP_4)  , S(JP_5)  ,                                        S(JP_6)   , S(JP_7)  , S(JP_8)  , S(JP_9)  , S(JP_SLSH), _______ ,
-    _______  ,_______   , _______  , _______ , _______  , _______  ,                                        S(JP_CIRC), JP_MINS  , JP_LBRC  , JP_RBRC  , JP_BSLS  , KC_DEL   ,
-    _______  ,_______   , _______  , _______ , _______  , _______  ,                                          JP_AT   ,S(JP_MINS),S(JP_LBRC),S(JP_RBRC), JP_YEN   , JP_CIRC  ,
+    _______  ,_______   , NGSW_LNX , NGSW_MAC, NGSW_WIN , NG_SHOS  ,                                        S(JP_CIRC), JP_MINS  , JP_LBRC  , JP_RBRC  , JP_BSLS  , KC_DEL   ,
+    _______  ,_______   , NG_KOTI  , NG_MLV  , NG_TAYO  , _______  ,                                          JP_AT   ,S(JP_MINS),S(JP_LBRC),S(JP_RBRC), JP_YEN   , JP_CIRC  ,
                   _______  , _______  , _______  ,         _______  , _______  ,                     _______  , _______  , _______       , _______  , _______
   ),
 
