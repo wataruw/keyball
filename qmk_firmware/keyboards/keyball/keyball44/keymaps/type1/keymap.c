@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#include "keymap_japanese.h"
 #include "twpair_on_jis.h"
 #include "naginata.h"
 
@@ -35,16 +36,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [1] = LAYOUT_universal(
-    _______  ,  KC_PMNS , KC_SCLN  , KC_7    , KC_8     , KC_9    ,                                         KC_HOME  , KC_UP    , KC_PGUP  , _______  , AML_TO   , _______  ,
-    _______  ,  KC_PPLS , KC_QUOT  , KC_4    , KC_5     , KC_6    ,                                         KC_LEFT  , KC_BTN1  , KC_RGHT  , KC_BTN2  , AML_I50  , KC_DEL   ,
-    _______  ,  KC_PDOT , KC_0     , KC_1    , KC_2     , KC_3     ,                                        KC_END   , KC_DOWN  , KC_PGDN  , _______  , KBC_SAVE , _______  ,
+    _______  ,  KC_PMNS , JP_SCLN  , JP_7    , JP_8     , JP_9    ,                                         KC_HOME  , KC_UP    , KC_PGUP  , _______  , AML_TO   , _______  ,
+    _______  ,  KC_PPLS , JP_COLN  , JP_4    , JP_5     , JP_6    ,                                         KC_LEFT  , KC_BTN1  , KC_RGHT  , KC_BTN2  , AML_I50  , KC_DEL   ,
+    _______  ,  KC_PDOT , JP_0     , JP_1    , JP_2     , JP_3     ,                                        KC_END   , KC_DOWN  , KC_PGDN  , _______  , KBC_SAVE , _______  ,
              RCTL_T(KC_C) , RCTL_T(KC_V) , _______       , _______ , KC_BTN1  ,                      _______  , _______  , _______       , _______  , _______
   ),
 
   [2] = LAYOUT_universal(
-    _______  ,S(KC_1)   , S(KC_2)  , S(KC_3) , S(KC_4)  , S(KC_5)  ,                                         S(KC_6)  , S(KC_7)  , S(KC_8)  , S(KC_9)  , S(KC_SLSH), _______ ,
-    _______  ,_______   , _______  , _______ , _______  , _______  ,                                         S(KC_EQL), KC_MINS  , KC_RBRC  , KC_BSLS  , KC_INT1  , KC_DEL   ,
-    _______  ,_______   , _______  , _______ , _______  , _______  ,                                         KC_LBRC  ,S(KC_MINS),S(KC_RBRC),S(KC_BSLS), KC_INT3  , KC_EQL   ,
+    _______  ,S(JP_1)   , S(JP_2)  , S(JP_3) , S(JP_4)  , S(JP_5)  ,                                        S(JP_6)   , S(JP_7)  , S(JP_8)  , S(JP_9)  , S(JP_SLSH), _______ ,
+    _______  ,_______   , _______  , _______ , _______  , _______  ,                                        S(JP_CIRC), JP_MINS  , JP_LBRC  , JP_RBRC  , JP_BSLS  , KC_DEL   ,
+    _______  ,_______   , _______  , _______ , _______  , _______  ,                                          JP_AT   ,S(JP_MINS),S(JP_LBRC),S(JP_RBRC), JP_YEN   , JP_CIRC  ,
                   _______  , _______  , _______  ,         _______  , _______  ,                     _______  , _______  , _______       , _______  , _______
   ),
 
@@ -64,12 +65,17 @@ void keyboard_post_init_user(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    // 薙刀式の処理
+  // 薙刀式の処理
     if (!process_naginata(keycode, record)) {
         return false;
     }
     
-    return twpair_on_jis(keycode, record);
+  // JIS配列に変換
+  // if (!twpair_on_jis(keycode, record)) {
+  //   return false;
+  // }
+
+  return true;
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
