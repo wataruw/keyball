@@ -31,21 +31,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB   , KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                                        KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     , KC_BSPC  ,
     KC_LCTL  , KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                                        KC_H     , KC_J     , KC_K     , KC_L     , KC_SCLN  , KC_ENT   ,
     KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_B     ,                                        KC_N     , KC_M     , KC_COMM  , KC_DOT   , KC_SLSH  , KC_ESC   ,
-              KC_LNG1, KC_LNG2, KC_LGUI                  , KC_SPC , MO(2),                       LT(1,KC_BTN1), KC_SPC, _______,     _______  , LT(3,KC_BTN2)
+              KC_LNG2, KC_LNG1, KC_LGUI                  , KC_SPC , MO(2),                       LT(1,KC_BTN1), KC_SPC, _______,     _______  , LT(3,KC_BTN2)
   ),
 
   [1] = LAYOUT_universal(
-    _______  ,  KC_F1   , KC_F2    , KC_F3   , KC_F4    , KC_F5    ,                                         KC_F6    , KC_F7    , KC_F8    , KC_F9    , KC_F10   , KC_F11   ,
-    _______  ,  _______ , _______  , KC_UP   , KC_ENT   , KC_DEL   ,                                         KC_PGUP  , KC_BTN1  , KC_UP    , KC_BTN2  , KC_BTN3  , KC_F12   ,
-    _______  ,  _______ , KC_LEFT  , KC_DOWN , KC_RGHT  , KC_BSPC  ,                                         KC_PGDN  , KC_LEFT  , KC_DOWN  , KC_RGHT  , _______  , _______  ,
+    _______  ,  KC_PMNS , KC_SCLN  , KC_7    , KC_8     , KC_9    ,                                         KC_HOME  , KC_UP    , KC_PGUP  , _______  , AML_TO   , _______  ,
+    _______  ,  KC_PPLS , KC_QUOT  , KC_4    , KC_5     , KC_6    ,                                         KC_LEFT  , KC_BTN1  , KC_RGHT  , KC_BTN2  , AML_I50  , KC_DEL   ,
+    _______  ,  KC_PDOT , KC_0     , KC_1    , KC_2     , KC_3     ,                                        KC_END   , KC_DOWN  , KC_PGDN  , _______  , KBC_SAVE , _______  ,
              RCTL_T(KC_C) , RCTL_T(KC_V) , _______       , _______ , KC_BTN1  ,                      _______  , _______  , _______       , _______  , _______
   ),
 
   [2] = LAYOUT_universal(
-    AML_TO   ,S(KC_QUOT), KC_7     , KC_8    , KC_9     , S(KC_8)  ,                                         S(KC_9)  , S(KC_1)  , S(KC_6)  , KC_LBRC  , S(KC_4)  , _______  ,
-    AML_I50  ,S(KC_SCLN), KC_4     , KC_5    , KC_6     , KC_RBRC  ,                                         KC_NUHS  , KC_MINS  , S(KC_EQL), S(KC_3)  , KC_QUOT  , S(KC_2)  ,
-    KBC_SAVE ,S(KC_MINS), KC_1     , KC_2    , KC_3     ,S(KC_RBRC),                                        S(KC_NUHS),S(KC_INT1), KC_EQL   ,S(KC_LBRC),S(KC_SLSH),S(KC_INT3),
-                  KC_0     , KC_DOT  , _______  ,         _______  , _______  ,                   KC_DEL   , _______  , _______       , _______  , _______
+    _______  ,S(KC_1)   , S(KC_2)  , S(KC_3) , S(KC_4)  , S(KC_5)  ,                                         S(KC_6)  , S(KC_7)  , S(KC_8)  , S(KC_9)  , S(KC_SLSH), _______ ,
+    _______  ,_______   , _______  , _______ , _______  , _______  ,                                         S(KC_EQL), KC_MINS  , KC_RBRC  , KC_BSLS  , KC_INT1  , KC_DEL   ,
+    _______  ,_______   , _______  , _______ , _______  , _______  ,                                         KC_LBRC  ,S(KC_MINS),S(KC_RBRC),S(KC_BSLS), KC_INT3  , KC_EQL   ,
+                  _______  , _______  , _______  ,         _______  , _______  ,                     _______  , _______  , _______       , _______  , _______
   ),
 
   // 薙刀式レイヤー
@@ -68,10 +68,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_naginata(keycode, record)) {
         return false;
     }
-    if (!twpair_on_jis(keycode, record)) {
-        return false;
-    }
-    return true;
+    
+    return twpair_on_jis(keycode, record);
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
