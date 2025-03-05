@@ -1,0 +1,61 @@
+/*
+This is the c configuration file for the keymap
+
+Copyright 2022 @Yowkees
+Copyright 2022 MURAOKA Taro (aka KoRoN, @kaoriya)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#pragma once
+
+#ifdef RGBLIGHT_ENABLE
+#    define RGBLIGHT_EFFECT_BREATHING
+#    define RGBLIGHT_EFFECT_RAINBOW_MOOD
+#    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
+#    define RGBLIGHT_EFFECT_SNAKE
+#    define RGBLIGHT_EFFECT_KNIGHT
+#    define RGBLIGHT_EFFECT_CHRISTMAS
+#    define RGBLIGHT_EFFECT_STATIC_GRADIENT
+#    define RGBLIGHT_EFFECT_RGB_TEST
+#    define RGBLIGHT_EFFECT_ALTERNATING
+#    define RGBLIGHT_EFFECT_TWINKLE
+#endif
+
+// 日本語キーボードの設定
+#define KEYBOARD_JAPANESE
+#define JP_KEYBOARD_MODE
+
+// 薙刀式の設定
+#define UNICODE_SELECTED_MODES UNICODE_MODE_MACOS, UNICODE_MODE_LINUX, UNICODE_MODE_WINCOMPOSE
+#define UNICODE_KEY_WINCOMPOSE KC_RALT
+#define NG_NO_HENSHU
+#define NG_NO_KOYUMEISHI
+
+// タップキーの遅延設定
+#define TAP_CODE_DELAY 10
+
+// レイヤー数の設定
+#define DYNAMIC_KEYMAP_LAYER_COUNT 4  // 0-3の4レイヤーをサポート
+#define LAYER_STATE_8BIT
+
+#define POINTING_DEVICE_AUTO_MOUSE_ENABLE
+#define AUTO_MOUSE_DEFAULT_LAYER 1
+
+#define SPLIT_HAND_MATRIX_GRID_LOW_IS_LEFT
+
+#undef LOCKING_SUPPORT_ENABLE
+#undef LOCKING_RESYNC_ENABLE
+#undef NO_ACTION_TAPPING
+
