@@ -138,8 +138,16 @@ const PROGMEM naginata_keymap ngmap[] = {
   {.key = B_D                      , .kana = "r"       }, // r
   {.key = B_C|B_V                  , .kana = "w"       }, // w
   {.key = B_COMM                   , .kana = "nn"      }, // ん
+  // 記号   
   {.key = B_DOT                    , .kana = "-"       }, // ー
-  // 濁音
+  {.key = B_S                      , .kana = "kakko"   }, // かっこ
+  {.key = B_Z                      , .kana = "ya"      }, // や 単語登録して
+  {.key = B_X                      , .kana = "?"       }, // ？
+  {.key = B_SHFT|B_X               , .kana = "!"       }, // ！
+  {.key = B_SCLN                   , .kana = "/"       }, // /
+  {.key = B_SLSH                   , .kana = ":"       }, // :
+  {.key = B_SHFT|B_SLSH            , .kana = ";"       }, // ;
+  // 濁音 
   {.key = B_SHFT|B_F               , .kana = "g"       }, // g
   {.key = B_SHFT|B_R               , .kana = "z"       }, // z
   {.key = B_SHFT|B_E               , .kana = "d"       }, // d
