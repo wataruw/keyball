@@ -159,14 +159,23 @@ const PROGMEM naginata_keymap ngmap[] = {
   {.key = B_SHFT|B_U               , .kana = "x"       }, // x
   {.key = B_Q                      , .kana = "xtu"     }, // っ
 
+  // 清音外来音 濁音外来音
+  {.key = B_E|B_L|B_I              , .kana = "thi"     }, // てぃ tyi
+  {.key = B_E|B_U|B_I              , .kana = "thi"     }, // てぃ txi
+  {.key = B_SHFT|B_E|B_L|B_I       , .kana = "dhi"     }, // でぃ dyi
+  {.key = B_SHFT|B_E|B_U|B_I       , .kana = "dhi"     }, // でぃ dxi
+  {.key = B_E|B_U|B_K              , .kana = "twu"     }, // とぅ txu
+  {.key = B_SHFT|B_E|B_U|B_K       , .kana = "dwu"     }, // どぅ dxu
+  {.key = B_SHFT|B_E|B_L|B_K       , .kana = "dhu"     }, // でゅ dyu
+  {.key = B_C|B_V|B_L|B_M          , .kana = "who"     }, // うぉ wyo
+  
   // 追加
   {.key = B_SHFT            , .kana = " "},
-  {.key = B_V|B_SHFT        , .kana = ","SS_TAP(X_ENTER)},
-  {.key = B_N|B_SHFT        , .kana = "."SS_TAP(X_ENTER)},
+  {.key = B_G               , .kana = ","SS_TAP(X_ENTER)},
+  {.key = B_H               , .kana = "."SS_TAP(X_ENTER)},
   {.key = B_U               , .kana = SS_TAP(X_BACKSPACE)},
 
   // enter
-  {.key = B_N               , .kana = SS_TAP(X_ENTER)},
   {.key = B_V|B_M           , .kana = SS_TAP(X_ENTER)},
   // enter+シフト(連続シフト)
   {.key = B_SHFT|B_V|B_M    , .kana = SS_TAP(X_ENTER)},
