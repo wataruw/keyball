@@ -50,9 +50,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // 薙刀式レイヤー
   [3] = LAYOUT_universal(
-    _______  , NG_Q     , NG_W     , NG_E     , NG_R     , NG_T     ,                                        NG_Y     , NG_U     , NG_I     , NG_O     , NG_P     , KC_BSPC  ,
-    _______  , NG_A     , NG_S     , NG_D     , NG_F     , NG_G     ,                                        NG_H     , NG_J     , NG_K     , NG_L     , NG_SCLN  , KC_ENT   ,
-    _______  , NG_Z     , NG_X     , NG_C     , NG_V     , NG_B     ,                                        NG_N     , NG_M     , NG_COMM  , NG_DOT   , NG_SLSH  , KC_ESC   ,
+    _______  , NG_Q     , NG_W     , NG_E     , NG_R     , KC_DOWN  ,                                        KC_UP    , NG_U     , NG_I     , NG_O     , NG_P     , KC_BSPC  ,
+    _______  , NG_A     , NG_S     , NG_D     , NG_F     , NG_G     ,                                        KC_RGHT  , NG_J     , NG_K     , NG_L     , NG_SCLN  , KC_ENT   ,
+    _______  , NG_Z     , NG_X     , NG_C     , NG_V     , KC_LEFT  ,                                        NG_N     , NG_M     , NG_COMM  , NG_DOT   , NG_SLSH  , KC_ESC   ,
               KC_LNG1, KC_LNG2, KC_LGUI                  , NG_SHFT  , MO(2)    ,                 LT(1,KC_BTN1), NG_SHFT2 , _______       , _______  , LT(3,KC_BTN2)
   ),
 };
