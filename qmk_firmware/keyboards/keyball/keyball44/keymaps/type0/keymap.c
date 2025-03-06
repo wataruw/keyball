@@ -34,7 +34,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______  ,  KC_PMNS , JP_SCLN  , JP_7    , JP_8     , JP_9    ,                                         KC_HOME  , KC_UP    , KC_PGUP  , _______  , AML_TO   , _______  ,
     _______  ,  KC_PPLS , JP_COLN  , JP_4    , JP_5     , JP_6    ,                                         KC_LEFT  , KC_BTN1  , KC_RGHT  , KC_BTN2  , AML_I50  , KC_DEL   ,
     _______  ,  KC_PDOT , JP_0     , JP_1    , JP_2     , JP_3     ,                                        KC_END   , KC_DOWN  , KC_PGDN  , _______  , KBC_SAVE , _______  ,
-             RCTL_T(KC_C) , RCTL_T(KC_V) , _______       , _______ , KC_BTN1  ,                      _______  , _______  , _______       , _______  , _______
+             LCTL(KC_C) , LCTL(KC_V)   , _______       , _______ , KC_BTN1  ,                      _______  , _______  , _______       , _______  , _______
   ),
 
   [2] = LAYOUT_universal(

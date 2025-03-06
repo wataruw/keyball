@@ -29,16 +29,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // keymap for default
   [0] = LAYOUT_universal(
     KC_TAB   , KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                                        KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     , KC_BSPC  ,
-    KC_LCTL  , KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                                        KC_H     , KC_J     , KC_K     , KC_L     , KC_SCLN  , KC_ENT   ,
+    KC_LCTL  , KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                                        KC_H     , KC_J     , KC_K     , KC_L     , KC_SCLN  , KC_DEL   ,
     KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_B     ,                                        KC_N     , KC_M     , KC_COMM  , KC_DOT   , KC_SLSH  , KC_ESC   ,
-              KC_LNG2, KC_LNG1, KC_LGUI                  , KC_SPC , MO(2),                       LT(1,KC_BTN1), KC_SPC, _______          , _______  , LT(3,KC_BTN2)
+              KC_LNG2, KC_LNG1, KC_LGUI                  , KC_SPC , MO(2),                       LT(1,KC_BTN1), KC_ENT, _______          , _______  , LT(3,KC_BTN2)
   ),
 
   [1] = LAYOUT_universal(
     _______  ,  KC_PMNS , JP_SCLN  , JP_7    , JP_8     , JP_9    ,                                         KC_HOME  , KC_UP    , KC_PGUP  , _______  , AML_TO   , _______  ,
     _______  ,  KC_PPLS , JP_COLN  , JP_4    , JP_5     , JP_6    ,                                         KC_LEFT  , KC_BTN1  , KC_RGHT  , KC_BTN2  , AML_I50  , KC_DEL   ,
     _______  ,  KC_PDOT , JP_0     , JP_1    , JP_2     , JP_3     ,                                        KC_END   , KC_DOWN  , KC_PGDN  , _______  , KBC_SAVE , _______  ,
-             RCTL_T(KC_C) , RCTL_T(KC_V) , _______       , _______ , KC_BTN1  ,                      _______  , _______  , _______       , _______  , _______
+             LCTL(KC_C) , LCTL(KC_V)  , _______       , _______ , KC_BTN1  ,                      _______  , _______  , _______       , _______  , _______
   ),
 
   [2] = LAYOUT_universal(
