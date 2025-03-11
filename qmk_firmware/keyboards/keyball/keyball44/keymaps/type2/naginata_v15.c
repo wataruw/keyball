@@ -351,12 +351,18 @@ bool process_modifier(uint16_t keycode, keyrecord_t *record) {
   if (IS_MODIFIER_KEYCODE(keycode) || IS_QK_MOD_TAP(keycode) || keycode == MO(1) || keycode == MO(2) || keycode == MO(3)) {
     if (record->event.pressed) {
       n_modifier++;
-      layer_off(naginata_layer);
+      if (is_naginata) {
+        // レイヤーオフ時には必ずnaginata_offを呼ぶ
+        naginata_off();
+      }
     } else {
       n_modifier--;
       if (n_modifier <= 0) {
         n_modifier = 0;
-        layer_on(naginata_layer);
+        if (is_naginata) {
+          // レイヤーオン時には必ずnaginata_onを呼ぶ
+          naginata_on();
+        }
       }
     }
     return true;
@@ -453,12 +459,21 @@ void naginata_clear(void) {
 bool process_naginata(uint16_t keycode, keyrecord_t *record) {
 
   // まれに薙刀モードオンのまま、レイヤーがオフになることがあるので、対策
-  if (n_modifier == 0 && is_naginata && !layer_state_is(naginata_layer))
-    layer_on(naginata_layer);
-  if (n_modifier == 0 && !is_naginata && layer_state_is(naginata_layer))
-    layer_off(naginata_layer);
-  if (n_modifier > 0 && layer_state_is(naginata_layer))
-    layer_off(naginata_layer);
+  if (is_naginata) {
+    if (n_modifier == 0 && !layer_state_is(naginata_layer)) {
+      layer_on(naginata_layer);
+      tap_code(KC_LANGUAGE_1); // Mac
+      tap_code(KC_INTERNATIONAL_4); // Win
+    } else if (n_modifier > 0 && layer_state_is(naginata_layer)) {
+      layer_off(naginata_layer);
+    }
+  } else {
+    if (layer_state_is(naginata_layer)) {
+      layer_off(naginata_layer);
+      tap_code(KC_LANGUAGE_2); // Mac
+      tap_code(KC_INTERNATIONAL_5); // Win
+    }
+  }
 
   // OS切り替え(UNICODE出力)
   if (record->event.pressed) {

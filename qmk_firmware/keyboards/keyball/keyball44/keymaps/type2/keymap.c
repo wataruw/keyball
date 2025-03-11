@@ -53,7 +53,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______  , NG_Q     , NG_W     , NG_E     , NG_R     , KC_DOWN  ,                                        KC_UP    , NG_U     , NG_I     , NG_O     , KC_F2    , KC_BSPC  ,
     _______  , NG_A     , NG_S     , NG_D     , NG_F     , NG_G     ,                                        NG_H     , NG_J     , NG_K     , NG_L     , NG_SCLN  , KC_ENT   ,
     _______  , NG_Z     , NG_X     , NG_C     , NG_V     , KC_LEFT  ,                                        KC_RGHT  , NG_M     , NG_COMM  , NG_DOT   , NG_SLSH  , KC_ESC   ,
-              KC_LNG1, KC_LNG2, KC_LGUI                  , NG_SHFT  , MO(2)    ,                 LT(1,KC_BTN1), NG_SHFT2 , _______       , _______  , LT(3,KC_BTN2)
+              KC_LNG1, KC_LNG2, KC_LGUI                  , NG_SHFT  , MO(2)    ,                         MO(1), NG_SHFT2 , _______       , _______  , MO(3)
   ),
 };
 // clang-format on
