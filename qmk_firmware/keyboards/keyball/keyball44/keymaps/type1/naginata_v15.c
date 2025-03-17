@@ -473,7 +473,7 @@ void ng_send_unicode_string_P(const char *pstr) {
 static int n_modifier = 0;
 
 bool process_modifier(uint16_t keycode, keyrecord_t *record) {
-  if (IS_MODIFIER_KEYCODE(keycode) || IS_QK_MOD_TAP(keycode)) {
+  if (IS_MODIFIER_KEYCODE(keycode) || IS_QK_MOD_TAP(keycode) || keycode == MO(1) || keycode == MO(2)) {
     if (record->event.pressed) {
       n_modifier++;
       layer_off(naginata_layer);
@@ -578,12 +578,17 @@ void naginata_clear(void) {
 bool process_naginata(uint16_t keycode, keyrecord_t *record) {
 
   // まれに薙刀モードオンのまま、レイヤーがオフになることがあるので、対策
-  if (n_modifier == 0 && is_naginata && !layer_state_is(naginata_layer))
+  if (n_modifier == 0 && is_naginata && !layer_state_is(naginata_layer)) {
     layer_on(naginata_layer);
-  if (n_modifier == 0 && !is_naginata && layer_state_is(naginata_layer))
+  }
+  if (n_modifier == 0 && !is_naginata && layer_state_is(naginata_layer)) {
     layer_off(naginata_layer);
-  if (n_modifier > 0 && layer_state_is(naginata_layer))
+  }
+  if (n_modifier > 0 && layer_state_is(naginata_layer)) {
     layer_off(naginata_layer);
+    tap_code(KC_LANGUAGE_1); // Mac
+    tap_code(KC_INTERNATIONAL_4); // Win
+  }
 
   // OS切り替え(UNICODE出力)
   if (record->event.pressed) {
