@@ -1,2 +1,6 @@
 tmp/
 .DS_Store
+
+# submodules
+src/qmk/
+src/vial-kb/
